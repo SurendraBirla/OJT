@@ -6,14 +6,17 @@ class User < ApplicationRecord
 
   belongs_to :role, optional: true
 
-  before_save :set_user_role, unless: :created_by_seed
+  before_save :set_user_role,if: :created_by_seed?
 
   before_save :set_user_status
-
+  
+  validates :name, presence: true
   validates :email, presence: true
   # validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :username, presence: true
-  validates :password,
+  # validates :status, presence: true
+  validates :role_id, presence: true
+  validates :password, presence: true,
             length: { minimum: 6 },
             if: -> { new_record? || !password.nil? }
 
@@ -27,7 +30,7 @@ class User < ApplicationRecord
      created_by_seed == true
   end    
 
-  def set_user_role     	
+  def set_user_role  
   	self.role = Role.find_by_name("User")
   end
 
